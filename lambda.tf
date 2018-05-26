@@ -38,16 +38,20 @@ locals {
   target_ami_name = "${var.target_ami_name_override != "" ? var.target_ami_name_override : "${module.label.id}-{{global:DATE_TIME}}"}"
 }
 
-output "target_ami_name" {
-  value = "${local.target_ami_name}"
+
+
+data "archive_file" "lambda_trigger_automation" {
+  type        = "zip"
+  source_file = "${path.module}/lambda-trigger-automation.py"
+  output_path = "${path.module}/lambda-trigger-automation.zip"
 }
 
 resource "aws_lambda_function" "lambda_trigger_automation" {
-  filename         = "lambda-trigger-automation.zip"
+  filename         = "${data.archive_file.lambda_trigger_automation.output_path}"
   function_name    = "${module.label.id}-trigger-automation"
   role             = "${aws_iam_role.role.arn}"
   handler          = "lambda-trigger-automation.lambda_handler"
-  source_code_hash = "${base64sha256(file("lambda-trigger-automation.zip"))}"
+  source_code_hash = "${data.archive_file.lambda_trigger_automation.output_base64sha256}"
   runtime          = "python2.7"
   tags             = "${module.label.tags}"
   timeout          = "15"
@@ -84,6 +88,10 @@ output "document_name" {
 
 output "source_ami_id" {
   value = "${local.ami}"
+}
+
+output "target_ami_name" {
+  value = "${local.target_ami_name}"
 }
 
 output "instance_iam_role" {
