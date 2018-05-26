@@ -5,3 +5,5 @@
 **/terraform.tfstate
 **/terraform.tfstate.backup
 
+dev.auto.tfvars
+*.zip

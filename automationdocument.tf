@@ -1,15 +1,6 @@
-# Based on AWS-UpdateLinuxAmi
-
-resource "aws_ssm_association" "association" {
-  name = "${aws_ssm_document.document.name}"
-
-  parameters {
-    "SourceAmiId" = "${data.aws_ami.default.id}"
-  }
-}
-
-resource "aws_ssm_document" "document" {
-  name          = "${module.label.id}-document"
+resource "aws_ssm_document" "document_linux" {
+  count         = "${var.os_type == "linux" ? 1 : 0 }"
+  name          = "${module.label.id}-linux-document"
   document_type = "Automation"
 
   content = <<DOC
@@ -143,6 +134,113 @@ resource "aws_ssm_document" "document" {
   "outputs": [
     "createImage.ImageId"
   ]
+}
+DOC
+}
+
+resource "aws_ssm_document" "document_windows" {
+  count         = "${var.os_type == "windows" ? 1 : 0 }"
+  name          = "${module.label.id}-windows-document"
+  document_type = "Automation"
+
+  content = <<DOC
+{
+   "description":"Systems Manager Automation – Patch AMI and Update SSM Param",
+   "schemaVersion":"0.3",
+   "assumeRole":"the role ARN you created",
+   "parameters":{
+      "sourceAMIid":{
+         "type":"String",
+         "description":"AMI to patch",
+         "default":"{{ssm:latestAmi}}"
+      },
+      "targetAMIname":{
+         "type":"String",
+         "description":"Name of new AMI",
+         "default":"patchedAMI-{{global:DATE_TIME}}"
+      }
+   },
+   "mainSteps":[
+      {
+         "name":"startInstances",
+         "action":"aws:runInstances",
+         "timeoutSeconds":1200,
+         "maxAttempts":1,
+         "onFailure":"Abort",
+         "inputs":{
+            "ImageId":"{{ sourceAMIid }}",
+            "InstanceType":"m3.large",
+            "MinInstanceCount":1,
+            "MaxInstanceCount":1,
+            "IamInstanceProfileName":"${aws_iam_role.role.name}"
+         }
+      },
+      {
+         "name":"installMissingWindowsUpdates",
+         "action":"aws:runCommand",
+         "maxAttempts":1,
+         "onFailure":"Continue",
+         "inputs":{
+            "DocumentName":"AWS-InstallMissingWindowsUpdates",
+            "InstanceIds":[
+               "{{ startInstances.InstanceIds }}"
+            ],
+            "Parameters":{
+               "UpdateLevel":"Important"
+            }
+         }
+      },
+      {
+         "name":"stopInstance",
+         "action":"aws:changeInstanceState",
+         "maxAttempts":1,
+         "onFailure":"Continue",
+         "inputs":{
+            "InstanceIds":[
+               "{{ startInstances.InstanceIds }}"
+            ],
+            "DesiredState":"stopped"
+         }
+      },
+      {
+         "name":"createImage",
+         "action":"aws:createImage",
+         "maxAttempts":1,
+         "onFailure":"Continue",
+         "inputs":{
+            "InstanceId":"{{ startInstances.InstanceIds }}",
+            "ImageName":"{{ targetAMIname }}",
+            "NoReboot":true,
+            "ImageDescription":"AMI created by EC2 Automation"
+         }
+      },
+      {
+         "name":"terminateInstance",
+         "action":"aws:changeInstanceState",
+         "maxAttempts":1,
+         "onFailure":"Continue",
+         "inputs":{
+            "InstanceIds":[
+               "{{ startInstances.InstanceIds }}"
+            ],
+            "DesiredState":"terminated"
+         }
+      },
+      {
+         "name":"updateSsmParam",
+         "action":"aws:invokeLambdaFunction",
+         "timeoutSeconds":1200,
+         "maxAttempts":1,
+         "onFailure":"Abort",
+         "inputs":{
+            "FunctionName":"Automation-UpdateSsmParam",
+            "Payload":"{\"parameterName\":\"latestAmi\", \"parameterValue\":\"{{createImage.ImageId}}\"}"
+         }
+      }
+   ],
+   "outputs":[
+      "createImage.ImageId"
+   ]
 }
 DOC
 }

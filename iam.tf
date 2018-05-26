@@ -9,15 +9,15 @@ data "aws_iam_policy_document" "ssm_role_policy" {
 
     principals {
       type        = "Service"
-      identifiers = ["ec2.amazonaws.com", "ssm.amazonaws.com", "lambda.amazonaws.com"]
+      identifiers = ["ec2.amazonaws.com", "ssm.amazonaws.com", "lambda.amazonaws.com", "sns.amazonaws.com"]
     }
   }
 }
 
 data "aws_iam_policy_document" "ssm_role_passrole" {
   statement {
-    actions  = ["iam:GetRole", "iam:PassRole"]
-    resource = ["${aws_iam_role.role.arn}"]
+    actions   = ["iam:GetRole", "iam:PassRole"]
+    resources = ["${aws_iam_role.role.arn}"]
   }
 }
 

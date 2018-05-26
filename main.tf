@@ -42,26 +42,32 @@ data "aws_ami" "default" {
 }
 
 data "aws_ami" "info" {
+  count = "${var.ami != "" ? 1 : 0}"
+
   filter {
     name   = "image-id"
-    values = ["${local.ami}"]
+    values = ["${var.ami}"]
   }
 }
 
-resource "aws_ssm_activation" "activate" {
-  name               = "test_ssm_activation"
-  description        = "Test"
-  iam_role           = "${aws_iam_role.role.id}"
-  registration_limit = "5"
-  depends_on         = ["aws_iam_role_policy_attachment.attach_ssm_automation"]
+locals {
+  ami = "${var.ami == "" ? data.aws_ami.default.id : join("~^~",data.aws_ami.info.*.id) }"
 }
+
+#  resource "aws_ssm_activation" "activate" {
+#   name               = "test_ssm_activation1"
+#   description        = "Test1"
+#   iam_role           = "${aws_iam_role.role.id}"
+#   registration_limit = "5"
+#   depends_on         = ["aws_iam_role_policy_attachment.attach_ssm_automation"]
+# }
 
 module "parameter" {
   source = "../terraform-aws-parameter-store"
 
   parameter_write = [{
     name      = "/${var.namespace}/${var.stage}/${var.name}/LatestAmi"
-    value     = "${var.ami == "" ? data.aws_ami.default.id : var.ami}"
+    value     = "${join("~^~",split("~^~",local.ami))}"
     type      = "String"
     overwrite = "true"
   }]

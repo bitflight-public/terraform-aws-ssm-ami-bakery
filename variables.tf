@@ -1,30 +1,4 @@
-variable "namespace" {
-  description = "Namespace (e.g. `cp` or `cloudposse`) - required for `tf_label` module"
-}
-
-variable "stage" {
-  description = "Stage (e.g. `prod`, `dev`, `staging` - required for `tf_label` module"
-}
-
-variable "name" {
-  description = "Name  (e.g. `bastion` or `db`) - required for `tf_label` module"
-}
-
-variable "delimiter" {
-  default = "-"
-}
-
-variable "attributes" {
-  description = "Additional attributes (e.g. `policy` or `role`)"
-  type        = "list"
-  default     = []
-}
-
-variable "tags" {
-  description = "Additional tags"
-  type        = "map"
-  default     = {}
-}
+# Label variables are stored in the labels.tf file for portibility.
 
 variable "enabled" {
   description = "When set to true, the resources in this module will be created"
@@ -42,6 +16,12 @@ variable "ami" {
   type        = "string"
   description = "Which base AMI should this module use"
   default     = ""
+}
+
+variable "os_type" {
+  type        = "string"
+  default     = "linux"
+  description = "Is the AMI of 'linux' or 'windows'"
 }
 
 variable "additional_role_arns" {
@@ -92,8 +72,14 @@ variable "activate" {
   default     = "false"
 }
 
-variable "userdata" {
+variable "additional_userdata" {
   type        = "string"
   description = "User data for the build"
   default     = ""
+}
+
+variable "new_ami_sns_topic_arns" {
+  type        = "list"
+  description = "A list of strings of the ARNS's of the SNS topics used to trigger a build. Defaults to the Amazon Linux topic."
+  default     = ["arn:aws:sns:us-east-1:137112412989:amazon-linux-ami-updates"]
 }
