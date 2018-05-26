@@ -34,7 +34,9 @@ def lambda_handler(event, context):
       'PreUpdateScript': [os.environ['PreUpdateScript'],], \
       'PostUpdateScript': [os.environ['PostUpdateScript'],], \
       'IncludePackages': [os.environ['IncludePackages'],], \
-      'ExcludePackages': [os.environ['ExcludePackages'],] \
+      'ExcludePackages': [os.environ['ExcludePackages'],], \
+      'SSMAmiLambdaFunctionName': [os.environ['SSMAmiLambdaFunctionName'],], \
+      'SourceAmiParameterName': [os.environ['SourceAmiParameterName'],] \
       }
     )
     logger.info(ami_id_response)

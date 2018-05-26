@@ -13,6 +13,14 @@ resource "aws_ssm_document" "document_linux" {
       "type": "String",
       "description": "(Required) The source Amazon Machine Image ID."
     },
+    "SourceAmiParameterName": {
+      "type": "String",
+      "description": "(Required) The Parameter Store key where the AMI id is stored."
+    },
+    "SSMAmiLambdaFunctionName": {
+      "type": "String",
+      "description": "(Required) The Lambda function name that should be triggered at the end of the build."
+    },
     "InstanceIamRole": {
       "type": "String",
       "description": "(Required) The name of the role that enables Systems Manager (SSM) to manage the instance.",
@@ -129,7 +137,18 @@ resource "aws_ssm_document" "document_linux" {
         ],
         "DesiredState": "terminated"
       }
-    }
+    },
+    {
+         "name":"updateSsmParam",
+         "action":"aws:invokeLambdaFunction",
+         "timeoutSeconds":1200,
+         "maxAttempts":1,
+         "onFailure":"Abort",
+         "inputs":{
+            "FunctionName":"{{SSMAmiLambdaFunctionName}}",
+            "Payload":"{\"parameterName\":\"{{SourceAmiParameterName}}\", \"parameterValue\":\"{{createImage.ImageId}}\"}"
+         }
+      }
   ],
   "outputs": [
     "createImage.ImageId"

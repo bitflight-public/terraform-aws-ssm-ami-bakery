@@ -78,8 +78,8 @@ variable "additional_userdata" {
   default     = ""
 }
 
-variable "new_ami_sns_topic_arns" {
-  type        = "list"
-  description = "A list of strings of the ARNS's of the SNS topics used to trigger a build. Defaults to the Amazon Linux topic."
-  default     = ["arn:aws:sns:us-east-1:137112412989:amazon-linux-ami-updates"]
+variable "kms_key_arn" {
+  type        = "string"
+  description = "KMS Key for decrypting/encrypting SSM Parameter store values"
+  default     = ""
 }
