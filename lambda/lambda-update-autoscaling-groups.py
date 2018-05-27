@@ -11,6 +11,9 @@ print('Loading function')
 def lambda_handler(event, context):
     print("Received event: " + json.dumps(event, indent=2))
 
+    if not event['targetASG']:
+        return 'No ASG to update'
+
     # get autoscaling client
     client = boto3.client('autoscaling')
 
