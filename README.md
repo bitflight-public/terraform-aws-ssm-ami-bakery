@@ -16,6 +16,7 @@ ThisTerraform Module creates AWS AMI's that can be easily kept up to date, autom
 - [ ] Import the file `linux-user-data.sh` append the variable `var.additional_userdata` to it, base64 encode it and update the SSM document
 - [ ] Create Submodule: Allow setting expiry of old images
 - [x] Allow updating of a specified ASG arn to use the new AMI
+- [x] Add the ability to wait for approval before updating the ASG
 
 ## Simple Example
 

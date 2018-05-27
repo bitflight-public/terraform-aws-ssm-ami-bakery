@@ -89,3 +89,21 @@ variable "target_asg" {
   description = "Automatically update this autoscaling group arn to use the new AMI if they were using the old AMI"
   default     = ""
 }
+
+variable "approvers_list" {
+  type        = "list"
+  description = "A list of IAM roles or users that are required to approve the ASG deployment"
+  default     = []
+}
+
+variable "min_num_approvers" {
+  type        = "string"
+  description = "The minimum number of users needed to approve the list. Defaults to 1"
+  default     = "1"
+}
+
+variable "require_approval_to_update_asg" {
+  type        = "string"
+  description = "If true, an additional section is added to the automation that requires user approval in the AWS SSM console before updating the ASG"
+  default     = "false"
+}

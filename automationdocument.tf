@@ -70,6 +70,11 @@ resource "aws_ssm_document" "document_linux" {
       "type": "String",
       "description": "(Optional) Autoscaling group ARN to update to use the new AMI created",
       "default": ""
+    },
+    "ApprovalNotificationArn": {
+      "type": "String",
+      "description": "(Optional) ARN of an SNS topic which to watch for approval requests",
+      "default": ""
     }
   },
   "mainSteps": [
@@ -158,7 +163,8 @@ resource "aws_ssm_document" "document_linux" {
             "FunctionName":"{{SSMAmiLambdaFunctionName}}",
             "Payload":"{\"parameterName\":\"{{SourceAmiParameterName}}\", \"parameterValue\":\"{{createImage.ImageId}}\"}"
          }
-      },
+      }
+      ${local.approval_request},
       {
          "name":"updateASG",
          "action":"aws:invokeLambdaFunction",
@@ -176,6 +182,17 @@ resource "aws_ssm_document" "document_linux" {
   ]
 }
 DOC
+}
+
+locals {
+  approval_request_format = {
+    "NotificationArn"      = "{{ApprovalNotificationArn}}"
+    "Message"              = "Please the Update of  this step of the Automation."
+    "MinRequiredApprovals" = "${min(var.min_num_approvers, length(var.approvers_list))}"
+    "Approvers"            = ["${var.approvers_list}"]
+  }
+
+  approval_request = "${var.require_approval_to_update_asg == "true" ? ",${jsonencode(local.approval_request_format)}" : ""}"
 }
 
 resource "aws_ssm_document" "document_windows" {
