@@ -14,21 +14,6 @@ variable "region" {
   default = "eu-west-2"
 }
 
-variable "tags" {
-  type    = "map"
-  default = {}
-}
-
-variable "parameter_write" {
-  default = []
-  type    = "list"
-}
-
-variable "parameter_read" {
-  type    = "list"
-  default = []
-}
-
 variable "new_ami_sns_topic_arns" {
   type        = "list"
   description = "A list of strings of the ARN's of the SNS topics used to trigger a build. Defaults to the Amazon Linux topic."
@@ -64,9 +49,10 @@ module "amazon_ami_bakery" {
   ami       = "${data.aws_ami.amazonlinux_ami.id}"
 }
 
-## Subscribe the Lambda Function to an SNS Topic to trigger the build
-## -> Extra AWS Provider pinned here, because the SNS topic subscription needs to be in the same region as the topic.
-## -> The default AWS update topic is in us-east-1
+# For Amazon Linux updates, they are only released in an SNS feed from us-east-1
+# Pin a provider to us-east-1 to create a topic subscription to that SNS feed.
+# Below we are subscribing the lambda function to this release notification, 
+# This means that on each release from amazon, we will update our custom image to match.
 
 provider "aws" {
   region = "us-east-1"
