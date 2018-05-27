@@ -8,6 +8,7 @@ ThisTerraform Module creates AWS AMI's that can be easily kept up to date, autom
 - [x] Test pipeline
 - [x] Create a basic example
 - [ ] Create a full README.md file
+- [ ] Enable logging of the update processes to cloudwatch
 - [ ] Provide inputs for specifying a subnet to launch in
 - [ ] Provide inputs for security groups to attach
 - [ ] Create output SNS queue, and write the queue arn to Parameter store, so that events can be chained together
@@ -23,7 +24,7 @@ This will:
 - Create the lambda functions needed to trigger the process
 - Create the Parameter Store Name `/cp/dev/amazon-linux/LatestAmi` and store the value of `ami` in it
 - Provide parameters to the lambda function such as a name template name template "{namespace}-{stage}-{name}-{date}"
-- Subscribe the lambda function to an SNS topic for it to be triggered
+- Subscribe the lambda function to an SNS topic for it to be triggered as per [this aws example](http://docs.amazonaws.cn/en_us/AWSEC2/latest/UserGuide/amazon-linux-ami-basics.html#linux-ami-notifications)
  
 
 When the lambda is triggered it will:
