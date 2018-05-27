@@ -15,7 +15,7 @@ ThisTerraform Module creates AWS AMI's that can be easily kept up to date, autom
 - [ ] Create output SNS queue, and write the queue arn to Parameter store, so that events can be chained together
 - [ ] Import the file `linux-user-data.sh` append the variable `var.additional_userdata` to it, base64 encode it and update the SSM document
 - [ ] Create Submodule: Allow setting expiry of old images
-- [ ] Submodule: Look for launch configurations and launch templates with the old image and output them
+- [x] Allow updating of a specified ASG arn to use the new AMI
 
 ## Simple Example
 
