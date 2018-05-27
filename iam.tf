@@ -43,6 +43,11 @@ resource "aws_iam_role_policy_attachment" "attach_lambda_role" {
   policy_arn = "arn:aws:iam::aws:policy/AWSLambdaExecute"
 }
 
+resource "aws_iam_role_policy_attachment" "attach_autoscaling_role" {
+  role       = "${aws_iam_role.role.name}"
+  policy_arn = "arn:aws:iam::aws:policy/AutoScalingFullAccess"
+}
+
 resource "aws_iam_policy" "policy_passrole" {
   name        = "${module.label.id}-passrole-policy"
   description = "${module.label.id}"

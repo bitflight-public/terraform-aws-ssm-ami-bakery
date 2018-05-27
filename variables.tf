@@ -83,3 +83,9 @@ variable "kms_key_arn" {
   description = "KMS Key for decrypting/encrypting SSM Parameter store values"
   default     = ""
 }
+
+variable "target_asg" {
+  type        = "string"
+  description = "Automatically update this autoscaling group arn to use the new AMI if they were using the old AMI"
+  default     = ""
+}

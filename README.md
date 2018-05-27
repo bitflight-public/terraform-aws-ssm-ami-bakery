@@ -10,6 +10,7 @@ ThisTerraform Module creates AWS AMI's that can be easily kept up to date, autom
 - [ ] Create a full README.md file
 - [ ] Enable logging of the update processes to cloudwatch
 - [ ] Provide inputs for specifying a subnet to launch in
+- [ ] Split the single role into 2 roles, one for lambda and one for SSM.
 - [ ] Provide inputs for security groups to attach
 - [ ] Create output SNS queue, and write the queue arn to Parameter store, so that events can be chained together
 - [ ] Import the file `linux-user-data.sh` append the variable `var.additional_userdata` to it, base64 encode it and update the SSM document

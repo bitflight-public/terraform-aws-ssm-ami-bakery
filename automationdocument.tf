@@ -60,6 +60,16 @@ resource "aws_ssm_document" "document_linux" {
       "type": "String",
       "description": "(Optional) Names of packages to hold back from updates, under all conditions. By default (\"none\"), no package is excluded.",
       "default": "none"
+    },
+    "SSMAutomationUpdateAsg": {
+      "type": "String",
+      "description": "Lambda function name that updates the ASGs",
+      "default": ""
+    },
+    "targetASG": {
+      "type": "String",
+      "description": "(Optional) Autoscaling group ARN to update to use the new AMI created",
+      "default": ""
     }
   },
   "mainSteps": [
@@ -147,6 +157,17 @@ resource "aws_ssm_document" "document_linux" {
          "inputs":{
             "FunctionName":"{{SSMAmiLambdaFunctionName}}",
             "Payload":"{\"parameterName\":\"{{SourceAmiParameterName}}\", \"parameterValue\":\"{{createImage.ImageId}}\"}"
+         }
+      },
+      {
+         "name":"updateASG",
+         "action":"aws:invokeLambdaFunction",
+         "timeoutSeconds":1200,
+         "maxAttempts":1,
+         "onFailure":"Abort",
+         "inputs": {
+            "FunctionName": "{{SSMAutomationUpdateAsg}}",
+            "Payload": "{\"targetASG\":\"{{targetASG}}\", \"newAmiID\":\"{{createImage.ImageId}}\"}"
          }
       }
   ],
