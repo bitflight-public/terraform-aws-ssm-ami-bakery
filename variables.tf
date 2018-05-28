@@ -91,15 +91,32 @@ variable "target_asg" {
 }
 
 variable "approvers_list" {
-  type        = "list"
-  description = "A list of IAM roles or users that are required to approve the ASG deployment"
-  default     = []
+  type = "list"
+
+  description = <<EOF
+A list of AWS authenticated principals who are able to either approve or reject the action. 
+The maximum number of approvers is 10. 
+You can specify principals by using any of the following formats:
+- An AWS Identity and Access Management (IAM) user name
+- An IAM user ARN
+- An IAM role ARN
+- An IAM assume role user ARN
+EOF
+
+  default = []
 }
 
 variable "min_num_approvers" {
-  type        = "string"
-  description = "The minimum number of users needed to approve the list. Defaults to 1"
-  default     = "1"
+  type = "string"
+
+  description = <<EOF
+The minimum number of approvals required to resume the Automation execution. 
+If you don't specify a value, the system defaults to one. The value for this parameter must be a positive number. 
+The value for this parameter can't exceed the number of approvers defined by the Approvers parameter.
+Defaults to 1"
+EOF
+
+  default = "1"
 }
 
 variable "require_approval_to_update_asg" {

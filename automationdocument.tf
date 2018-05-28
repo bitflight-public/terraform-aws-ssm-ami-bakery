@@ -187,12 +187,19 @@ DOC
 locals {
   approval_request_format = {
     "NotificationArn"      = "{{ApprovalNotificationArn}}"
-    "Message"              = "Please the Update of  this step of the Automation."
+    "Message"              = "Please the approve the update of the ASGs."
+    "timeoutSeconds"       = 86000
+    "onFailure"            = "Abort"
     "MinRequiredApprovals" = "${min(var.min_num_approvers, length(var.approvers_list))}"
     "Approvers"            = ["${var.approvers_list}"]
   }
 
   approval_request = "${var.require_approval_to_update_asg == "true" ? ",${jsonencode(local.approval_request_format)}" : ""}"
+}
+
+resource "aws_sns_topic" "approve_asg_updates" {
+  count       = "${var.require_approval_to_update_asg == "true" ? 1 : 0}"
+  name_prefix = "Automation-${module.label.id}"
 }
 
 resource "aws_ssm_document" "document_windows" {

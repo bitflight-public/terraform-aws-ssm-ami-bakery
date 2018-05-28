@@ -76,6 +76,7 @@ resource "aws_lambda_function" "lambda_trigger_automation" {
       SourceAmiParameterName   = "${join("",module.parameter.names)}"
       SSMAutomationUpdateAsg   = "${aws_lambda_function.lambda_update_asg.function_name}"
       targetASG                = "${var.target_asg}"
+      ApprovalNotificationArn  = "${join("",aws_sns_topic.approve_asg_updates.*.arn)}"
     }
   }
 }

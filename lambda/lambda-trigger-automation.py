@@ -36,6 +36,7 @@ def lambda_handler(event, context):
       'IncludePackages': [os.environ['IncludePackages'],], \
       'ExcludePackages': [os.environ['ExcludePackages'],], \
       'SSMAmiLambdaFunctionName': [os.environ['SSMAmiLambdaFunctionName'],], \
+      'ApprovalNotificationArn': [os.environ['ApprovalNotificationArn'],], \
       'SourceAmiParameterName': [os.environ['SourceAmiParameterName'],] \
       }
     )
