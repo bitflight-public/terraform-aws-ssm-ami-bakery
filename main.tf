@@ -1,5 +1,6 @@
 # SSM AMI Updater
 
+# Use this data source to validtate that the AMI exists.
 data "aws_ami" "info" {
   filter {
     name   = "image-id"

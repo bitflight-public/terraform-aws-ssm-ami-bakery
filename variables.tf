@@ -1,11 +1,5 @@
 # Label variables are stored in the labels.tf file for portibility.
 
-variable "enabled" {
-  description = "When set to true, the resources in this module will be created"
-  type        = "string"
-  default     = "true"
-}
-
 variable "subnet" {
   type        = "string"
   description = "Which subnet should the AMI be in when building"
