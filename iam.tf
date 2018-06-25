@@ -21,6 +21,17 @@ data "aws_iam_policy_document" "ssm_role_passrole" {
   }
 }
 
+resource "aws_iam_policy" "policy_passrole" {
+  name        = "${module.label.id}-passrole-policy"
+  description = "${module.label.id}"
+  policy      = "${data.aws_iam_policy_document.ssm_role_passrole.json}"
+}
+
+resource "aws_iam_role_policy_attachment" "attach_passrole" {
+  role       = "${aws_iam_role.role.name}"
+  policy_arn = "${aws_iam_policy.policy_passrole.arn}"
+}
+
 resource "aws_iam_role" "role" {
   name = "${module.label.id}-role"
   path = "/"
@@ -46,17 +57,6 @@ resource "aws_iam_role_policy_attachment" "attach_lambda_role" {
 resource "aws_iam_role_policy_attachment" "attach_autoscaling_role" {
   role       = "${aws_iam_role.role.name}"
   policy_arn = "arn:aws:iam::aws:policy/AutoScalingFullAccess"
-}
-
-resource "aws_iam_policy" "policy_passrole" {
-  name        = "${module.label.id}-passrole-policy"
-  description = "${module.label.id}"
-  policy      = "${data.aws_iam_policy_document.ssm_role_passrole.json}"
-}
-
-resource "aws_iam_role_policy_attachment" "attach_passrole" {
-  role       = "${aws_iam_role.role.name}"
-  policy_arn = "${aws_iam_policy.policy_passrole.arn}"
 }
 
 resource "aws_iam_role_policy_attachment" "attach_additional" {

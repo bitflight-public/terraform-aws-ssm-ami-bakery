@@ -1,6 +1,6 @@
 # terraform-aws-ssm-ami-bakery
 
-ThisTerraform Module creates AWS AMI's that can be easily kept up to date, automatically applying operating system (OS) patches to a Windows or Linux AMI that is already considered to be the most up-to-date or latest AMI. In the example, the default value of the parameter SourceAmiId is defined by a Systems Manager Parameter Store parameter called latestAmi. The value of latestAmi is updated by an AWS Lambda function invoked at the end of the Automation workflow. As a result of this Automation process, the time and effort spent patching AMIs is minimized because patching is always applied to the most up-to-date AMI.
+This Terraform Module creates AWS AMI's that can be easily kept up to date, automatically applying operating system (OS) patches to a Windows or Linux AMI that is already considered to be the most up-to-date or latest AMI. In the example, the default value of the parameter `SourceAmiId` is defined by a Systems Manager Parameter Store parameter called `latestAmi`. The value of `latestAmi` is updated by an AWS Lambda function invoked at the end of the Automation workflow. As a result of this Automation process, the time and effort spent patching AMIs is minimized.
 
 ## TODO:
 - [x] Create Lambda functions
@@ -20,7 +20,7 @@ ThisTerraform Module creates AWS AMI's that can be easily kept up to date, autom
 
 ## Simple Example
 
-This will:
+**This will:**
 - Create a SSM automation document for linux
 - Create appropriate roles and policies to run the process
 - Create the lambda functions needed to trigger the process
@@ -29,7 +29,7 @@ This will:
 - Subscribe the lambda function to an SNS topic for it to be triggered as per [this aws example](http://docs.amazonaws.cn/en_us/AWSEC2/latest/UserGuide/amazon-linux-ami-basics.html#linux-ami-notifications)
  
 
-When the lambda is triggered it will:
+**When the lambda is triggered it will:**
 - Launch the specified AMI as a new instance
 - Generate a new ami with the name template "{namespace}-{stage}-{name}-{date}" and in the example below the output template is `cp-dev-amazon-linux-{{global:DATE_TIME}}`
 - Install the latest SSM agent on it if it is not installed already.
@@ -43,7 +43,7 @@ provider "aws" {
 	region = "eu-west-2"
 }
 
-module "keep_ami_current" {
+module "keep_ami_patched" {
   source    = "git::git@github.com:bitflight-public/terraform-aws-ssm-ami-bakery.git"
   namespace = "cp"
   stage     = "dev"
@@ -64,6 +64,6 @@ resource "aws_sns_topic_subscription" "trigger_automation" {
   provider  = "aws.us-east-1"
   topic_arn = "arn:aws:sns:us-east-1:137112412989:amazon-linux-ami-updates"
   protocol  = "lambda"
-  endpoint  = "${module.amazon_ami_bakery.lambda_endpoint_arn}"
+  endpoint  = "${module.keep_ami_patched.lambda_endpoint_arn}"
 }
 ```
